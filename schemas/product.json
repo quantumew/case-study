@@ -1,0 +1,33 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "number",
+            "description": "Unique ID associated with the product."
+        },
+        "current_price": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "currency_code": {
+                    "type": "string",
+                    "description": "Currency code for current. In a post-prototype environment this should be updated to an enum."
+                },
+                "value": {
+                    "type": "number",
+                    "description": "The current price of the product."
+                }
+            },
+            "required": [
+                "currency_code",
+                "value"
+            ]
+        }
+    },
+    "required": [
+        "id",
+        "current_price"
+    ],
+    "$schema": "http://json-schema.org/draft-04/schema#"
+}

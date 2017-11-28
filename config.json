@@ -1,0 +1,10 @@
+{
+    "database": {
+        "host": "localhost",
+        "port": 27017,
+        "database": "case_study"
+    },
+    "log_level": "DEBUG",
+    "product_endpoint": "http://redsky.target.com/v2/pdp/tcin/",
+    "product_endpoint_exclude_fields": "taxonomy,price,promotion,bulk_ship,rating_and_review_reviews,rating_and_review_statistics,question_answer_statistics"
+}
