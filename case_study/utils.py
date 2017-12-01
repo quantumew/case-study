@@ -32,4 +32,4 @@ def load_docs():
     logging.basicConfig(level=config.get("log_level"))
     persistance_manager = PersistanceManager(logging, config.get("database"))
     data = load_json("./data/test-data.json")
-    persistance_manager.insert_many_docs(data)
+    persistance_manager.upsert_many_docs(data)

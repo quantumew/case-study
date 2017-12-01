@@ -10,14 +10,16 @@ import json
 import unittest
 import logging
 import requests_mock
+from urllib.parse import urljoin
 from case_study.app import app
 from case_study.utils import load_docs
+from case_study.configure import app_config
 
 class TestProductRoutes(unittest.TestCase):
-    DEFAULT_URL = "http://redsky.target.com/v2/pdp/tcin/13860428?excludes=taxonomy,price,promotion,bulk_ship,rating_and_review_reviews,rating_and_review_statistics,question_answer_statistics"
-
     def setUp(self):
         # Lazily disabling logging for now for better deciphering of test output.
+        config = {}
+        app_config(config)
         logging.disable(logging.CRITICAL)
         self.app = app.test_client()
         load_docs()
@@ -29,13 +31,14 @@ class TestProductRoutes(unittest.TestCase):
                 "value": 13.49
             }
         }
+        self.product_url = urljoin(config["product_endpoint"], str(self.valid_doc["id"])) + "?excludes={}".format(config["product_endpoint_exclude_fields"])
         self.valid_redsky_response = {
             "product": { "item": { "product_description": { "title": "The Big Lebowski (Blu-ray)"}}}
         }
 
     def test_get_entry(self):
         with requests_mock.mock() as m:
-            m.get(TestProductRoutes.DEFAULT_URL, text=json.dumps(self.valid_redsky_response))
+            m.get(self.product_url, text=json.dumps(self.valid_redsky_response))
             r = self.app.get("/products/{}".format(self.valid_doc["id"]))
 
         self.assertEqual(json.loads(r.get_data()), self.valid_doc)
@@ -56,7 +59,7 @@ class TestProductRoutes(unittest.TestCase):
         self.valid_doc["current_price"]["value"] = 100.00
 
         with requests_mock.mock() as m:
-            m.get(TestProductRoutes.DEFAULT_URL, text=json.dumps(self.valid_redsky_response))
+            m.get(self.product_url, text=json.dumps(self.valid_redsky_response))
             r = self.app.put("/products/{}".format(data["id"]), data=json.dumps(data))
 
         self.assertEqual(json.loads(r.get_data()), self.valid_doc)

@@ -84,7 +84,7 @@ class ProductManager(object):
         if loaded_product["id"] != product_id:
             raise InvalidRequestError('provided document id "{}" did not match id in request URL "{}"'.format(loaded_product["id"], product_id))
 
-        self.persistance_manager.insert_product(deepcopy(loaded_product))
+        self.persistance_manager.upsert_product(deepcopy(loaded_product))
         name = self.product_service_manager.fetch_name(product_id)
 
         if name:

@@ -19,9 +19,9 @@ class PersistanceManager(object):
         self.client = MongoClient(self.host, self.port)
         self.db = self.client[self.db_name]
 
-    def insert_product(self, document):
+    def upsert_product(self, document):
         """
-            Inserts a single document into document store.
+            Upserts a single document into document store.
 
             Args:
                 self(case_study.persistance_manager.PersistanceManager)
@@ -30,8 +30,9 @@ class PersistanceManager(object):
             Returns:
                 dict
         """
-        self.logger.info("Inserting provided document {}".format(document))
-        result = self.db.products.insert_one(document)
+        self.logger.info("Upserting provided document {}".format(document))
+
+        result = self.db.products.update_one({"id": document["id"]}, {"$set": document}, upsert=True)
 
         return result
 
@@ -50,5 +51,16 @@ class PersistanceManager(object):
 
         return self.db.products.find_one({"id": product_id})
 
-    def insert_many_docs(self, payload):
-        return self.db.products.insert_many(payload)
+    def upsert_many_docs(self, payload):
+        """
+            Upserts many documents provided in payload.
+
+            Args:
+                payload([]dict)
+        """
+        bulk = self.db.products.initialize_ordered_bulk_op()
+
+        for item in payload:
+            bulk.find({"id": item["id"]}).upsert().update({"$set": item})
+
+        bulk.execute()

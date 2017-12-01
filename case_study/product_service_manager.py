@@ -4,6 +4,7 @@
 
 from urllib.parse import urljoin
 import requests
+from case_study.errors import ProductNotFoundError
 
 class ProductServiceManager(object):
     def __init__(self, endpoint, qs):
@@ -27,7 +28,7 @@ class ProductServiceManager(object):
         result = requests.get(product_url)
 
         if result.status_code != requests.codes["ok"]:
-            result.raise_for_status()
+            raise ProductNotFoundError("could not find product name for ID {}".format(product_id))
 
         data = result.json()
 
